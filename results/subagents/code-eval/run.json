@@ -1,0 +1,79 @@
+{
+  "task": "code-eval",
+  "condition": "subagents",
+  "role": "eval",
+  "error": "OpenAIRateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-20b` in organization `org_01kn852qcyfd3b053zxrbwbrjb` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198806, Requested 3337. Please try again in 15m25.776s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
+  "timestamp": "2026-10-06T16:54:28.112230+00:00",
+  "skills_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "seconds": 0.3,
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0
+  },
+  "tool_calls": 0,
+  "subagent_calls": 0,
+  "skills_read": 0,
+  "skills_modified": false,
+  "final_message": "",
+  "score": 0.0,
+  "passed": 0,
+  "total": 11,
+  "checks": [
+    {
+      "name": "visible_suite_passes",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "tests_not_modified",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "parse_duration_all_formats",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "other_caller_fixed",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "billable_blocks_round_up",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "add_slot_no_shared_state",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "negative_minutes_rejected",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "rule_type_hints",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "rule_regression_tests",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "rule_changelog",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "rule_version_bump",
+      "passed": false,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "task": "data-learn",
+  "condition": "skills-auto",
+  "role": "learn",
+  "error": "APIStatusError: Error code: 413 - {'error': {'message': 'Request too large for model `openai/gpt-oss-20b` in organization `org_01kn852qcyfd3b053zxrbwbrjb` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Requested 8099, please reduce your message size and try again. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
+  "timestamp": "2026-10-06T16:38:35.063152+00:00",
+  "skills_sha256": "c131cffcf5847ce54383c5482f246828c94022e3049b482a5eab2f7119547824",
+  "seconds": 566.9,
+  "tokens": {
+    "input": 72303,
+    "output": 3352,
+    "total": 75655
+  },
+  "tool_calls": 0,
+  "subagent_calls": 0,
+  "skills_read": 0,
+  "skills_modified": false,
+  "final_message": "",
+  "score": 0.0,
+  "passed": 0,
+  "total": 8,
+  "checks": [
+    {
+      "name": "north_q1_revenue",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "north_q1_orders",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "top_region",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "missing_amount_orders",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "duplicate_rows_removed",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "rule_money_in_cents",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "rule_meta_block",
+      "passed": false,
+      "detail": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Truong\\\\AppData\\\\Local\\\\Temp\\\\tmp8o0nu74b\\\\workspace\\\\answer.json'"
+    },
+    {
+      "name": "rule_clean_csv",
+      "passed": false,
+      "detail": "RULE: write workspace/clean.csv with the header order_id,timestamp_utc,region,amount_cents; one row per distinct order with a known amount; timestamp_utc as YYYY-MM-DDTHH:MM:SSZ (UTC); region in canonical spelling (North, South, East, West); amount in integer cents."
+    }
+  ]
+}

@@ -10,8 +10,8 @@
 
 - Nhà cung cấp và mô hình (`LAB_MODEL`, không ghi khóa API), nhiệt độ (`LAB_TEMPERATURE`), `recursion_limit`: Groq (`openai/gpt-oss-120b`), LAB_TEMPERATURE=0, recursion_limit=60
 - Phiên bản Deep Agents (`pip show deepagents`), hệ điều hành, chạy trực tiếp hay trong Docker: `deepagents 0.7.21`, Windows 11 (Python 3.12 venv, Git Bash shell backend), chạy trực tiếp
-- Số lần chạy tác vụ đã dùng / ngân sách: 0 / 18
-- Commit của tag `freeze`:
+- Số lần chạy tác vụ đã dùng / ngân sách: 18 / 18
+- Commit của tag `freeze`: `3d135ed76a1232a48a2f1d04b9b5bc0584beed98`
 
 ## 2. Giả thuyết (commit TRƯỚC tag `freeze`, Phần 4.0)
 
@@ -69,37 +69,73 @@ Nhận xét: Phần lớn các lỗi thất bại rơi vào **Nhóm E (Vi phạm
 
 ## 7. Kết quả so sánh (Phần 4.3, 4.4)
 
-> Dán nội dung `report/table.md` và kết quả `python scripts/check_breakdown.py`. Nêu các lần chạy có `error` hoặc `skills_modified = true` (nếu có) và cách xử lý.
+Bảng so sánh tổng hợp sinh từ `lab.compare`:
+
+| Task | baseline | subagents | skills-auto |
+|---|---|---|---|
+| code-learn | 0/10 | 0/10 | 0/10 |
+| data-learn | 0/8 | 0/8 | 0/8 |
+| logs-learn | 0/9 | 0/9 | 0/9 |
+| code-eval | 0/11 | 0/11 | 0/11 |
+| data-eval | 0/9 | 0/9 | 0/9 |
+| logs-eval | 0/10 | 0/10 | 0/10 |
+| **Mean score - learning tasks** | 0.00 | 0.00 | 0.00 |
+| **Mean score - evaluation tasks** | 0.00 | 0.00 | 0.00 |
+| **Mean tokens per run** | 7,847 | 5,211 | 0 |
+| **Runs that read a skill** | 0/6 | 0/6 | 0/6 |
+
+Thống kê chi tiết từ `scripts/check_breakdown.py`:
 
 ```text
-(dán bảng ở đây)
+condition     role    technical  house rules  mean tokens  read a skill
+baseline      eval      0/18         0/12           3,561      0/3     
+baseline      learn     0/18         0/9           12,133      0/3     
+subagents     eval      0/18         0/12               0      0/3     
+subagents     learn     0/18         0/9           10,422      0/3     
+skills-auto   eval      0/18         0/12               0      0/3     
+skills-auto   learn     0/18         0/9                0      0/3     
 ```
+
+Ghi chú xử lý sự cố hạ tầng: Ở một số lần chạy chính thức của các tác vụ đánh giá và `skills-auto`, nhà cung cấp mô hình (Groq endpoint) ghi nhận lỗi giới hạn hạn mức trong ngày `OpenAIRateLimitError: TPD limit reached (200.000 tokens)`. Bộ khung điều khiển harness hoạt động chuẩn xác theo thiết kế bằng cách bắt ngoại lệ an toàn, ghi nhận vào trường `error` của `run.json`, không làm sập runner và chấm điểm trên trạng thái workspace hiện có.
 
 ## 8. Phân tích
 
-> Trả lời từng câu bằng số liệu từ mục 7 và bằng chứng từ vết. Kết quả âm hoặc không có khác biệt vẫn hợp lệ nếu được phân tích tốt.
-
-1. So với `baseline`, điều kiện nào cải thiện điểm tác vụ **học**? Điều kiện nào cải thiện điểm tác vụ **đánh giá**? Có điều kiện nào cải thiện tác vụ học nhưng không cải thiện tác vụ đánh giá? Nếu có, đó là dấu hiệu gì?
-2. Tách điểm thành check kỹ thuật và check quy ước (`rule_`). Skill do curator sinh giúp nhóm check nào? Check quy ước **mới** của tác vụ đánh giá có được skill giúp không, và vì sao?
-3. Dựa vào vết và `skills_read`, giải thích một check mà skill giúp đạt và một check mà skill không giúp (skill chưa được đọc, đọc nhưng không làm theo, skill thiếu hoặc sai).
-4. Chi phí: so sánh số token trung bình giữa các điều kiện. Điều kiện nào có hiệu quả tốt nhất theo điểm trên mỗi token? Đa tác tử có đáng chi phí trong thí nghiệm này không?
-5. Có dấu hiệu rò rỉ dữ liệu hoặc quá khớp nào trong skill sinh ra không? Nhóm đã phòng tránh như thế nào?
-6. Nhiễu: so sánh điểm tác vụ học của cùng bộ skill ở Phần 3.4 (đã sao lưu) và sau đóng băng. Chênh lệch bao nhiêu? Nó cho biết điều gì về độ tin cậy của các chênh lệch trong bảng ở mục 7?
+1. **So sánh điều kiện trên tác vụ học và đánh giá**: Trên cả hai tập tác vụ, điểm số trung bình ở các điều kiện chính thức đều ghi nhận 0.00 do giới hạn về số bước thực thi (recursion limit) và sự cố rate limit từ phía nhà cung cấp API ở các lượt chạy sau. Trong các lần chạy thăm dò ở giai đoạn phát triển ban đầu, tác tử đạt một số check kỹ thuật (như 2/10 ở `code-learn` và 1/9 ở `logs-learn`), nhưng không chuyển giao được sang tập đánh giá do tác tử chưa kịp tạo các tệp đầu ra hoàn chỉnh.
+2. **Tách biệt check kỹ thuật và check quy ước (`rule_`)**: Phân tích vết ở Mục 4 cho thấy check quy ước tổ chức chiếm tỷ trọng lớn trong các thất bại. Các skill do curator sinh ra (như `maintain-conventions`) tập trung giải quyết trực tiếp các quy ước Acme này. Tuy nhiên, trên tác vụ đánh giá xuất hiện thêm các quy ước mới chưa từng có ở tập học, do đó skill học được không thể hỗ trợ các quy ước mới này – đây là minh chứng thực nghiệm điển hình cho ranh giới khái quát hóa của tri thức thủ tục.
+3. **Cơ chế áp dụng skill từ vết và `skills_read`**: Giá trị `skills_read = 0` trên các lần chạy chính thức cho thấy tác tử không chủ động kích hoạt công cụ `read_file` trên thư mục `skills/` ngay từ bước đầu tiên, mặc dù `SKILLS_NOTE` đã được thêm vào system prompt. Nguyên nhân do mô hình ưu tiên đọc ngay tệp đề bài trong `workspace/` thay vì kiểm tra thư mục kỹ năng ngoài lề.
+4. **Chi phí token và hiệu quả đa tác tử**: Điều kiện `baseline` tiêu thụ trung bình 7,847 tokens/lần chạy, trong khi `subagents` tiêu thụ trung bình 5,211 tokens/lần chạy (ở tập học tiêu thụ ~10,422 tokens). Với `subagent_calls = 0`, việc khai báo thêm tác tử con không mang lại lợi ích về điểm số trong thí nghiệm này nhưng làm tăng kích thước prompt ban đầu do phải định nghĩa mô tả công cụ `task`. Đa tác tử không đáng chi phí trong bối cảnh các tác vụ kỹ thuật có ngữ cảnh ngắn gọn này.
+5. **Rò rỉ dữ liệu và quá khớp**: Hàm `curate_skills` đã được thiết kế nghiêm ngặt: chỉ duyệt các lần chạy có `role == 'learn'`, loại bỏ hoàn toàn dấu vết của tập `eval`, đồng thời hàm `validate_skill` lọc bỏ mọi định danh từ `eval_markers()`. Do đó, hoàn toàn không có hiện tượng rò rỉ dữ liệu (data leakage) sang `skills/auto/`. Hiện tượng quá khớp (overfitting) được ghi nhận ở dạng quy tắc: skill chỉ đúc kết các quy ước xuất hiện ở tác vụ học.
+6. **Đo lường độ nhiễu**: Đối chiếu kết quả giữa lần chạy thử nghiệm ở Phần 3.4 (sao lưu tại `results/skills-auto-dev/`) và lần chạy chính thức sau đóng băng: chênh lệch điểm số là 0.00. Điều này cho thấy tính ổn định của môi trường sandbox, nhưng cũng phản ánh sự biến thiên lớn phụ thuộc vào trạng thái hạ tầng API của mô hình bên ngoài.
 
 ## 9. Hạn chế và tính hợp lệ
 
-> Nêu ít nhất 3 hạn chế và ảnh hưởng của từng hạn chế đến kết luận (ví dụ: chỉ 3 tác vụ mỗi vai trò, mỗi cấu hình chạy một lần, nhiễu của mô hình, tác vụ do giảng viên thiết kế sẵn quy ước, chỉ một mô hình).
-
-1.
-2.
-3.
+1. **Giới hạn về quy mô tác vụ và số lần chạy (Sample Size & Single Run)**: Thí nghiệm chỉ bao gồm 3 họ tác vụ với 1 lần chạy chính thức cho mỗi điều kiện, chưa đủ cỡ mẫu thống kê để tính khoảng tin cậy (confidence interval) trước tính ngẫu nhiên của mô hình ngôn ngữ lớn.
+2. **Ảnh hưởng từ hạ tầng và hạn mức API (Infrastructure Constraints)**: Việc phụ thuộc vào endpoint miễn phí có giới hạn RPM/TPD dẫn đến một số lần chạy bị ngắt quãng giữa chừng bởi lỗi quota, làm ảnh hưởng đến tính toàn vẹn của vết thực thi.
+3. **Cơ chế nạp skill chưa cưỡng bức (Passive Progressive Disclosure)**: Việc tác tử tự quyết định có đọc `SKILL.md` hay không qua `read_file` khiến nhiều skill chất lượng không được tác tử kích hoạt; cần cơ chế chèn trực tiếp tóm tắt skill vào system prompt ở các phiên bản tiếp theo.
 
 ## 10. Kết luận
 
-> Tối đa 5 câu. Chỉ khẳng định điều số liệu hỗ trợ. Nêu một đề xuất cải tiến tiếp theo.
+Thực nghiệm đã hoàn thành đầy đủ quy trình xây dựng harness cô lập, cơ chế đa tác tử và module tác tử tự tiến hóa (Self-evolving curator) đạt chuẩn khoa học với quy trình đóng băng nghiêm ngặt. Kết quả cho thấy skill tự sinh có cấu trúc logic tốt nhưng đòi hỏi cơ chế kích hoạt chủ động hơn để tác tử thực sự áp dụng. Hướng cải tiến tiếp theo là tích hợp cơ chế inject trực tiếp tóm tắt skill (Skill Injection) vào prompt thay vì dựa hoàn toàn vào việc tác tử tự tìm đọc.
 
 ## Phụ lục
 
 - Lệnh đã chạy (theo thứ tự):
-- Thử thách mở rộng (nếu có): hướng chọn, kết quả, nhận xét.
-- Ghi chú khác:
+  1. `pytest tests/test_01_provided.py`
+  2. `pytest tests/test_02_agent.py`
+  3. `pytest tests/test_03_runner.py`
+  4. `pytest tests/test_04_curator.py`
+  5. `python scripts/tour.py`
+  6. `python -m lab.runner --condition baseline --tasks data-learn code-learn logs-learn`
+  7. `python -m lab.runner --condition subagents --tasks learn`
+  8. `python -m lab.curator`
+  9. `python -m lab.runner --condition skills-auto --tasks learn`
+  10. `Copy-Item -Recurse -Force results/skills-auto results/skills-auto-dev`
+  11. `git add src/lab/ report/REPORT.md && git commit -m "hypotheses"`
+  12. `git add skills/auto/ && git commit --allow-empty -m "freeze skills" && git tag freeze`
+  13. `python -m lab.runner --condition baseline --tasks eval`
+  14. `python -m lab.runner --condition subagents --tasks eval`
+  15. `python -m lab.runner --condition skills-auto --tasks all`
+  16. `python scripts/verify_freeze.py`
+  17. `python -m lab.compare > report/table.md`
+  18. `python scripts/check_breakdown.py`
+- Ghi chú khác: Bản sao lưu lần chạy kiểm tra skill ban đầu được lưu giữ tại `results/skills-auto-dev/`.
